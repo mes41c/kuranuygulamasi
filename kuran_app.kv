@@ -157,8 +157,8 @@
                 width: dp(100)
                 font_size: dp(15)
                 on_press: root.get_random_ayet_button_pressed()
-            Button:
-                text: "⚙️" # Ayarlar ikonu için emoji veya kısa metin
+            MDIconButton:
+                icon: "cog"
                 font_size: dp(20) # İkon gibi görünmesi için fontu büyütebiliriz
                 size_hint_x: None
                 width: self.height # Kare bir buton için genişliği yüksekliğe eşitle
