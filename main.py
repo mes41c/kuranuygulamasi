@@ -14,6 +14,7 @@ import threading
 import collections 
 import traceback
 import sqlite3 
+import platform
 
 from kivy.uix.button import Button
 from kivy.uix.label import Label
