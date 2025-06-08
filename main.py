@@ -2,14 +2,13 @@
 import os
 # os.environ['KIVY_TEXT'] = 'pango'
 
-from kivy.app import App
+from kivymd.app import MDApp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.properties import ObjectProperty, StringProperty, ListProperty, NumericProperty, BooleanProperty, DictProperty
 from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.event import EventDispatcher
-from kivy.app import App
 import threading
 import collections 
 import traceback
@@ -675,7 +674,7 @@ class AIScreen(Screen):
         self.on_enter()
 
     def send_to_ai(self):
-        if platform != 'android':
+        if platform.system().lower() != 'android':
             popup = Popup(title='Uyarı',
                           content=Label(text='Bu özellik sadece Android cihazlarda çalışır.'),
                           size_hint=(0.8, 0.4))
@@ -1957,7 +1956,7 @@ class SettingsScreen(Screen):
         self.update_status_message(status_message)
         Clock.schedule_once(lambda dt: self.update_status_message(""), 3)
 
-class KuranApp(App, EventDispatcher):
+class KuranApp(MDApp, EventDispatcher):
     ARABIC_FONT_NAME = StringProperty('fonts/NotoNaskhArabic-VariableFont_wght.ttf')
     user_settings = DictProperty({})
     favorite_ayets = ListProperty([]) 
