@@ -47,6 +47,9 @@ jobs:
         id: buildozer
         with:
           command: buildozer -v android debug
+          env: |
+            KIVY_USE_GSTREAMER=0
+            KIVY_USE_AVFOUNDATION=0
 
       # Adım 4: APK'yı yüklüyoruz.
       - name: Upload artifacts
