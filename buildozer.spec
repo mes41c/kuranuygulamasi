@@ -5,7 +5,7 @@ package.domain = com.github.mes41c
 source.dir = .
 source.include_exts = py,png,db,kv,ttf
 version = 0.1
-requirements = python3,git+https://github.com/kivy/kivy.git,git+https://github.com/kivy/pyjnius.git
+requirements = python3,kivy==2.3.0,kivymd==1.2.0,pillow,sqlite3,beautifulsoup4,requests,plyer,yeni_kivy_client,pango,gstreamer,sdl2,git+https://github.com/kivy/kivy.git,git+https://github.com/kivy/pyjnius.git
 orientation = portrait
 fullscreen = 0
 
