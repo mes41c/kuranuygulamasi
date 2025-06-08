@@ -265,7 +265,7 @@ class SelectableLabel(RecycleDataViewBehavior, Label):
             self._long_press_scheduled = False # Uzun basma tetiklendi, bayrağı sıfırla
             
             # Uzun basma eylemini gerçekleştir: Popup'ı aç
-            app = App.get_running_app()
+            app = MDApp.get_running_app()
             if app and hasattr(app.root, 'get_screen'):
                 subject_screen = app.root.get_screen('subject_selection')
                 if subject_screen:
@@ -555,7 +555,7 @@ class SubjectSelectionScreen(Screen):
 
 
     def go_to_read_mode_with_subject(self, sure_no, ayet_no):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app and app.root and hasattr(app.root, 'get_screen'):
             read_mode_screen = app.root.get_screen('read_mode')
             if read_mode_screen:
@@ -581,7 +581,7 @@ class SubjectSelectionScreen(Screen):
         self.populate_surah_list()
 
     def go_to_main_menu_from_subjects(self):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app and app.root:
             app.root.current = 'main'
             if hasattr(app.root, 'transition'): app.root.transition = FadeTransition(duration=0.2)
@@ -674,7 +674,7 @@ class AIScreen(Screen):
         self.on_enter()
 
     def send_to_ai(self):
-        if platform.system().lower() != 'android':
+        if platform.system().lower() != 'linux':
             popup = Popup(title='Uyarı',
                           content=Label(text='Bu özellik sadece Android cihazlarda çalışır.'),
                           size_hint=(0.8, 0.4))
@@ -709,7 +709,7 @@ class AIScreen(Screen):
             mealler = self.context_data.get('mealler', [])
             selected_meals_for_ai = []
             
-            app = App.get_running_app()
+            app = MDApp.get_running_app()
             if app and mealler:
                 favorite_ids = app.user_settings.get("favorite_translator_ids", [])
                 
@@ -778,7 +778,7 @@ class MainScreen(Screen):
 
     def go_to_ai_screen_with_context(self):
         """AI ekranına geçmeden önce mevcut ayet bağlamını aktarır."""
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if not app: return
         
         ai_screen = app.root.get_screen('ai_screen')
@@ -802,7 +802,7 @@ class MainScreen(Screen):
 
         normalized_search_text = ayat_utils.normalize_turkish_text_for_search(search_text)
         displayed_meal_count = 0
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
 
         # --- YENİ SIRALAMA MANTIĞI BAŞLANGICI ---
         
@@ -949,7 +949,7 @@ class MainScreen(Screen):
                 self.result_label.text = "Daha önce bir yer işareti kaydetmediniz."
 
     def _late_init(self, dt):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app:
             if not self._event_bound_fav_hocas:
                 try:
@@ -966,7 +966,7 @@ class MainScreen(Screen):
                     ayat_utils.cprint_debug(f"HATA: MainScreen on_favorite_ayets_changed bağlanamadı: {e}", "EVENT_BIND_ERROR")
 
     def go_to_subject_selection(self):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app and app.root:
             # Konu ekranına gitmeden önce, oradan geri dönüldüğünde belirli bir sureyi gösterme bayrağını temizle
             subject_screen = app.root.get_screen('subject_selection')
@@ -1109,7 +1109,7 @@ class MainScreen(Screen):
                 search_input_hata.text = ""
     
     def update_favorite_ayet_button_status(self, *args):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if not self.favorite_ayet_button: return
 
         if self.current_ayet_data and app:
@@ -1152,7 +1152,7 @@ class MainScreen(Screen):
         return False
 
     def show_hoca_info_popup(self, goruntulenecek_ad, canonical_tam_ad, site_id_from_meal, *args):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         hoca_adi_sorgu = canonical_tam_ad if canonical_tam_ad is not None else goruntulenecek_ad
         hoca_data = ayat_utils.get_hoca_bilgisi_data(hoca_adi_sorgu)
         
@@ -1195,7 +1195,7 @@ class MainScreen(Screen):
         self._current_hoca_info_popup.open()
 
     def handle_star_press_in_hoca_popup_wrapper(self, site_id, toggle_button_instance, *args):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app: app.toggle_hoca_favorite(site_id, toggle_button_instance) 
 
     def set_error_message_on_header(self, message):
@@ -1238,7 +1238,7 @@ class MainScreen(Screen):
         popup.open()
 
     def go_to_read_mode(self, sure_no, ayet_no):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app and app.root and hasattr(app.root, 'get_screen'):
             read_mode_screen = app.root.get_screen('read_mode')
             if read_mode_screen:
@@ -1249,7 +1249,7 @@ class MainScreen(Screen):
         else: self.update_status_console("HATA: App root veya get_screen metodu bulunamadı.")
             
     def toggle_current_ayet_favorite(self):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if self.current_ayet_data and self.current_ayet_data.get("sure_adi") != "Bulunamadı":
             sure_no = self.current_ayet_data.get('sure_no')
             ayet_no = self.current_ayet_data.get('ayet_no')
@@ -1361,7 +1361,7 @@ class ReadModeScreen(Screen):
         popup.open()
 
     def _late_init_read_mode(self, dt):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app:
             if not self._event_bound_fav_hocas_readmode:
                 try: 
@@ -1377,7 +1377,7 @@ class ReadModeScreen(Screen):
 
     def return_to_subject_screen(self):
         if self.return_to_subject_surah_name and self.return_to_subject_surah_no != 0:
-            app = App.get_running_app()
+            app = MDApp.get_running_app()
             if app and app.root:
                 try:
                     subject_screen = app.root.get_screen('subject_selection')
@@ -1393,7 +1393,7 @@ class ReadModeScreen(Screen):
             self._display_ayet_in_read_mode(dict(self.current_ayet_data_read))
 
     def update_favorite_ayet_button_status_read(self, *args):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if self.favorite_ayet_button_read and self.current_ayet_data_read and app:
             if self.current_ayet_data_read.get("sure_adi") != "Bulunamadı":
                 sure_no = self.current_sure_no 
@@ -1489,7 +1489,7 @@ class ReadModeScreen(Screen):
         if self.mealler_read_layout:
             self.mealler_read_layout.clear_widgets()
             all_mealler_read = self.current_ayet_data_read.get('mealler', [])
-            app = App.get_running_app()
+            app = MDApp.get_running_app()
             preferred_hoca_ids_read = app.user_settings.get("favorite_translator_ids", DEFAULT_READ_MODE_HOCA_IDS)
             max_favs_to_show_read = app.user_settings.get("max_favorites_limit", 3)
                 
@@ -1513,7 +1513,7 @@ class ReadModeScreen(Screen):
 
     def _add_meal_to_read_mode_layout(self, meal_data):
         if not self.mealler_read_layout: return
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         hoca_adi_raw = meal_data.get('yazar_raw', 'Bilinmeyen Yazar')
         meal_metni = meal_data.get('metin', 'Meal bulunamadı.')
         site_id = meal_data.get('id')
@@ -1534,7 +1534,7 @@ class ReadModeScreen(Screen):
         hoca_name_label = Label(text=f"{goruntulenecek_ad}", size_hint_x=1, halign='left', valign='middle', font_size=dp(15))
         hoca_name_label.bind(text_size=lambda i,v: setattr(i,'text_size',(i.width-dp(10),None)))
         
-        main_screen_ref = App.get_running_app().root.get_screen('main') if App.get_running_app() and App.get_running_app().root else None
+        main_screen_ref = MDApp.get_running_app().root.get_screen('main') if MDApp.get_running_app() and MDApp.get_running_app().root else None
         if main_screen_ref: hoca_name_label.bind(on_touch_down=partial(main_screen_ref.trigger_hoca_info_popup_from_label, goruntulenecek_ad, canonical_tam_ad, site_id))
         
         hoca_header_layout.add_widget(star_button)
@@ -1656,7 +1656,7 @@ class ReadModeScreen(Screen):
             Clock.schedule_once(lambda dt: setattr(self.read_mode_jump_input, 'hint_text', original_hint), 2)
             
     def go_to_main_menu(self):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app and app.root: 
             app.root.current = 'main'
 
@@ -1664,7 +1664,7 @@ class ReadModeScreen(Screen):
         ayat_utils.cprint_debug(message, "KIVY_READ_MODE")
 
     def toggle_current_ayet_favorite_read_mode(self):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if self.current_ayet_data_read and self.current_ayet_data_read.get("sure_adi") != "Bulunamadı":
             sure_no = self.current_sure_no
             ayet_no = self.current_ayet_no
@@ -1682,7 +1682,7 @@ class HistoryScreen(Screen):
         Clock.schedule_once(self._late_init_history_screen)
 
     def _late_init_history_screen(self, dt):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app and hasattr(app, 'on_favorite_ayets_changed') and not self._event_bound_fav_ayets_history_screen:
             try:
                 app.bind(on_favorite_ayets_changed=self._handle_app_fav_ayets_changed_history)
@@ -1692,7 +1692,7 @@ class HistoryScreen(Screen):
 
     def on_pre_leave(self, *args):
         super().on_pre_leave(*args)
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app and self._event_bound_fav_ayets_history_screen:
             try:
                 app.unbind(on_favorite_ayets_changed=self._handle_app_fav_ayets_changed_history)
@@ -1709,7 +1709,7 @@ class HistoryScreen(Screen):
         self.populate_history()
 
     def toggle_favorite_from_history(self, s_no, a_no, button_instance, *args):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app:
             app.toggle_ayet_favorite(s_no, a_no, button_instance)
 
@@ -1723,7 +1723,7 @@ class HistoryScreen(Screen):
             self.history_layout.add_widget(no_history_label)
             return
 
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
 
         for (sorgu_id, s_no, a_no, s_adi, _) in list(ayat_utils.query_history):
             item_row_layout = BoxLayout(orientation='horizontal', size_hint_y=None, height=dp(50), spacing=dp(5), padding=(dp(5),0,dp(5),0))
@@ -1755,7 +1755,7 @@ class HistoryScreen(Screen):
             self.update_status_console_local(f"HATA: Sorgu ID {sorgu_id_to_delete} geçmişten silinemedi.")
 
     def load_ayet_from_history(self, sure_no, ayet_no, *args):
-        app_ref = App.get_running_app()
+        app_ref = MDApp.get_running_app()
         if not app_ref or not app_ref.root : return
         main_screen = app_ref.root.get_screen('main')
         if main_screen and main_screen.sorgu_input:
@@ -1777,7 +1777,7 @@ class FavoriteAyetsScreen(Screen):
         Clock.schedule_once(self._late_init_fav_ayets)
 
     def _late_init_fav_ayets(self, dt):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app and not self._event_bound_fav_ayets_screen:
             try:
                 app.bind(on_favorite_ayets_changed=self._handle_app_fav_ayets_changed)
@@ -1797,7 +1797,7 @@ class FavoriteAyetsScreen(Screen):
         if not self.favorite_ayets_layout:
             return
         self.favorite_ayets_layout.clear_widgets()
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         
         if not app or not app.favorite_ayets:
             no_favorites_label = Label(text="Henüz favori ayetiniz yok.", size_hint_y=None, height=dp(60))
@@ -1822,7 +1822,7 @@ class FavoriteAyetsScreen(Screen):
             self.favorite_ayets_layout.add_widget(row_layout)
 
     def go_to_ayet(self, sure_no, ayet_no, *args):
-        app_ref = App.get_running_app()
+        app_ref = MDApp.get_running_app()
         if not app_ref or not app_ref.root : return
         main_screen = app_ref.root.get_screen('main')
         if main_screen and main_screen.sorgu_input:
@@ -1833,11 +1833,11 @@ class FavoriteAyetsScreen(Screen):
         if hasattr(app_ref.root, 'transition'): app_ref.root.transition = FadeTransition(duration=0.3)
 
     def remove_ayet_from_favorites(self, sure_no, ayet_no, *args):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app: app.toggle_ayet_favorite(sure_no, ayet_no, None)
 
     def go_to_main_menu(self):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if app and app.root:
             app.root.current = 'main'
             
@@ -1853,7 +1853,7 @@ class SettingsScreen(Screen):
 
     def on_pre_enter(self):
         super().on_pre_enter()
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if not app: return
         self._temp_selected_favorite_ids = list(app.user_settings.get("favorite_translator_ids", []))
         current_max_limit = app.user_settings.get("max_favorites_limit", 3)
@@ -1883,7 +1883,7 @@ class SettingsScreen(Screen):
 
     def handle_hoca_toggle(self, site_id_to_toggle, toggle_button_instance, *args):
         self.update_status_message("")
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if not app: return
 
         # Ayarları doğrudan app.user_settings üzerinden alalım
@@ -1920,7 +1920,7 @@ class SettingsScreen(Screen):
 
     def save_slider_setting(self, slider_instance):
         # Bu yeni fonksiyon, kullanıcı slider'ı bıraktığında çalışır
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         if not app: return
 
         new_max_limit = int(slider_instance.value)
