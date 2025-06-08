@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ayat_utils.py
 # -*- coding: utf-8 -*-
 
