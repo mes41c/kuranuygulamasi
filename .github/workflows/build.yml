@@ -28,9 +28,6 @@ jobs:
             libsdl2-image-dev \
             libsdl2-mixer-dev \
             libsdl2-ttf-dev \
-            libgstreamer1.0-dev \
-            gstreamer1.0-plugins-base \
-            gstreamer1.0-plugins-good \
             libwayland-dev \
             libx11-dev
 
