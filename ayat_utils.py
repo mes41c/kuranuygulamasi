@@ -3,8 +3,6 @@
 
 import time
 import json
-import sys
-import shutil
 import sqlite3
 import os
 import re
@@ -12,10 +10,8 @@ import collections
 import random
 import traceback
 import xml.etree.ElementTree as ET
-from kivy.utils import platform
 
-SOURCE_DATABASE_NAME = "kuran_uyg_genel_data.db"
-DATABASE_FILE = os.path.join(get_app_root_path(), SOURCE_DATABASE_NAME)
+DATABASE_FILE = "kuran_uyg_genel_data.db" # SQLite veritabanı dosyanız
 
 MAX_HISTORY_SIZE = 50
 MAX_FAVORITE_AYETS_SIZE = 500
@@ -27,83 +23,6 @@ query_history = collections.deque(maxlen=MAX_HISTORY_SIZE)
 ayet_cache = {}
 favorite_ayets_list = collections.deque(maxlen=MAX_FAVORITE_AYETS_SIZE)
 
-def get_app_root_path():
-    """Uygulamanın çalıştırıldığı platforma göre kök veya veri dizinini döndürür."""
-    if platform == 'android':
-        # Android'de uygulamanın özel, yazılabilir veri klasörü
-        return App.get_running_app().user_data_dir
-    else:
-        # Masaüstü (Windows, Linux, macOS) için kodun çalıştığı dizin
-        if getattr(sys, 'frozen', False):
-            # PyInstaller gibi bir araçla paketlenmişse
-            return os.path.dirname(sys.executable)
-        return os.path.dirname(os.path.abspath(__file__))
-
-def initialize_database():
-    """
-    Veritabanının yazılabilir bir konumda olup olmadığını kontrol eder.
-    Eğer yoksa, uygulama paketindeki (salt-okunur) veritabanını
-    yazılabilir konuma kopyalar.
-    """
-    app_path = get_app_root_path()
-    db_path_in_writable_dir = os.path.join(app_path, SOURCE_DATABASE_NAME)
-
-    # Eğer veritabanı zaten yazılabilir alanda varsa, bir şey yapma
-    if os.path.exists(db_path_in_writable_dir):
-        cprint_debug(f"Veritabanı zaten mevcut: {db_path_in_writable_dir}", "DB_INIT")
-        return
-
-    cprint_debug(f"Veritabanı bulunamadı. Kopyalanacak: {db_path_in_writable_dir}", "DB_INIT")
-
-    # Uygulama paketinin içindeki kaynak veritabanının yolunu bul
-    # Bu yol, masaüstünde farklı, Android'de farklı olabilir.
-    # Genellikle masaüstünde aynı dizindedir.
-    source_db_path_candidates = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), SOURCE_DATABASE_NAME), # Geliştirme ortamı
-        os.path.join(sys._MEIPASS, SOURCE_DATABASE_NAME) if hasattr(sys, '_MEIPASS') else '' # PyInstaller için
-    ]
-    
-    # Android için, Buildozer varlıkları ana dizine koyar
-    if platform == 'android':
-         # Android'de uygulama paketinin kök dizinini bulmak daha karmaşıktır.
-         # Genellikle 'get_asset_path' gibi bir helper fonksiyon kullanılır.
-         # Şimdilik, Buildozer'ın dosyayı uygulamanın mevcut çalışma dizinine
-         # koyduğunu varsayarak basit bir yaklaşım deneyelim.
-         from kivy.app import App
-         # Bu, Android'de uygulamanın yüklendiği ana dizini verir (örn: /data/user/0/org.test.kuranapp/files)
-         # Ancak paketlenmiş orijinal dosya burada değildir.
-         # Orijinal dosya, APK içindedir ve doğrudan erişilemez.
-         # Buildozer, source.include_exts ile eklenen dosyaları
-         # uygulamanın başlangıç dizinine (cwd) kopyalar.
-         source_db_path = os.path.join(os.getcwd(), SOURCE_DATABASE_NAME)
-    else:
-        source_db_path = source_db_path_candidates[0]
-
-
-    found_source = False
-    if os.path.exists(source_db_path):
-        found_source = True
-    else: # Diğer adayları dene
-        for candidate in source_db_path_candidates:
-            if candidate and os.path.exists(candidate):
-                source_db_path = candidate
-                found_source = True
-                break
-    
-    if not found_source:
-        cprint_debug(f"HATA: Kaynak veritabanı '{SOURCE_DATABASE_NAME}' hiçbir konumda bulunamadı!", "DB_INIT_FATAL")
-        # Burada uygulamayı durdurmak veya bir hata popup'ı göstermek iyi olabilir.
-        return
-
-    try:
-        # Yazılabilir klasörün var olduğundan emin ol
-        os.makedirs(app_path, exist_ok=True)
-        # Kopyalama işlemini yap
-        shutil.copy2(source_db_path, db_path_in_writable_dir)
-        cprint_debug(f"Veritabanı başarıyla '{source_db_path}' konumundan '{db_path_in_writable_dir}' konumuna kopyalandı.", "DB_INIT_SUCCESS")
-    except Exception as e:
-        cprint_debug(f"HATA: Veritabanı kopyalanırken hata oluştu: {e}", "DB_INIT_COPY_ERROR")
-        traceback.print_exc()
 
 def cprint_debug(text, prefix="DEBUG"):
     print(f"[{prefix}] {time.strftime('%Y-%m-%d %H:%M:%S')} - {text}")
