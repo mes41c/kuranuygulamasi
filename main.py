@@ -1,6 +1,6 @@
 # main.py
 import os
-import sys
+# os.environ['KIVY_TEXT'] = 'pango'
 
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -22,7 +22,6 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.togglebutton import ToggleButton
-from kivy.utils import platform
 from kivy.uix.slider import Slider
 from kivy.metrics import dp
 from kivy.core.clipboard import Clipboard
@@ -35,30 +34,13 @@ from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from functools import partial
 import ayat_utils 
 
-def get_asset_path(filename):
-    """
-    Verilen dosya adı için platforma uygun tam yolu döndürür.
-    Buildozer ile paketlendiğinde varlıkların uygulamanın kök dizininde olduğunu varsayar.
-    """
-    if platform == 'android':
-        # Android'de, buildozer.spec'e eklenen dosyalar genellikle uygulamanın
-        # mevcut çalışma dizininden (cwd) erişilebilir.
-        return os.path.join(os.getcwd(), filename)
-    else:
-        # Masaüstü için göreceli yol
-        if getattr(sys, 'frozen', False):
-            # PyInstaller gibi bir araçla paketlenmişse
-            return os.path.join(os.path.dirname(sys.executable), filename)
-        return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
-
 Builder.load_file('kuran_app.kv') 
 
 DEFAULT_READ_MODE_HOCA_IDS = ["besimatalay", "ismailyakit", "bayraktar"]
-STAR_EMPTY_IMG = get_asset_path('images/star_empty.png')
-STAR_FILLED_IMG = get_asset_path('images/star_filled.png')
-HEART_EMPTY_IMG = get_asset_path('images/heart_empty.png')
-HEART_FILLED_IMG = get_asset_path('images/heart_filled.png')
-ARABIC_FONT_PATH = get_asset_path('fonts/NotoNaskhArabic-VariableFont_wght.ttf')
+STAR_EMPTY_IMG = 'images/star_empty.png'
+STAR_FILLED_IMG = 'images/star_filled.png'
+HEART_EMPTY_IMG = 'images/heart_empty.png'
+HEART_FILLED_IMG = 'images/heart_filled.png'
 
 class SureSubjectsPopup(Popup):
     popup_title = StringProperty("Sure Konuları")
@@ -1975,7 +1957,7 @@ class SettingsScreen(Screen):
         Clock.schedule_once(lambda dt: self.update_status_message(""), 3)
 
 class KuranApp(App, EventDispatcher):
-    ARABIC_FONT_NAME = StringProperty(ARABIC_FONT_PATH)
+    ARABIC_FONT_NAME = StringProperty('fonts/NotoNaskhArabic-VariableFont_wght.ttf')
     user_settings = DictProperty({})
     favorite_ayets = ListProperty([]) 
     HEART_EMPTY_IMG = StringProperty(HEART_EMPTY_IMG) 
@@ -2004,7 +1986,6 @@ class KuranApp(App, EventDispatcher):
         return sm
 
     def on_start(self):
-        ayat_utils.initialize_database()
         ayat_utils.hoca_veritabani_yukle()
         ayat_utils.load_query_history()
         ayat_utils.load_quran_corpus_data()
@@ -2102,5 +2083,4 @@ class KuranApp(App, EventDispatcher):
         ayat_utils.cprint_debug(message, "KIVY_APP")
 
 if __name__ == '__main__':
-
     KuranApp().run()
