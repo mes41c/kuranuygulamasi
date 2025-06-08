@@ -1,0 +1,1752 @@
+<<<<<<< HEAD
+#:import metrics kivy.metrics
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+
+<SureSubjectsPopup>:
+    title: root.popup_title
+    size_hint: (0.9, 0.85)
+    auto_dismiss: True
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(8)
+        canvas.before:
+            Color:
+                rgba: 0.12, 0.12, 0.12, 0.99
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        RecycleView:
+            id: popup_subjects_rv
+            viewclass: 'SelectableLabel'
+            data: root.subjects_list_data
+            scroll_type: ['bars', 'content']
+            bar_width: dp(8)
+            CustomRecycleBoxLayout:
+                default_size: None, dp(48)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+                spacing: dp(3)
+        Button:
+            text: "Kapat"
+            font_size: dp(15)
+            size_hint_y: None
+            height: dp(45)
+            on_press: root.dismiss()
+
+<ManageFavoritesPopup>:
+    title: "Favori Yönetimi" 
+    size_hint: 0.9, 0.8
+    auto_dismiss: True
+    favorite_management_layout: fav_management_layout_in_kv 
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+
+        Label:
+            id: info_label_for_popup 
+            text: root.info_text_for_label # Python'daki property'den metni al
+            size_hint_y: None
+            height: self.texture_size[1] + dp(20)
+            halign: 'center'
+            text_size: self.width - dp(20), None
+
+        ScrollView:
+            size_hint_y: 1
+            GridLayout:
+                id: fav_management_layout_in_kv 
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: dp(5)
+        
+        Button:
+            text: "Kapat"
+            size_hint_y: None
+            height: dp(44)
+            on_press: root.dismiss()
+
+<FullTextPopup>:
+    title: root.popup_title
+    size_hint: (0.9, 0.7)
+    auto_dismiss: True
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+        canvas.before:
+            Color:
+                rgba: 0.18, 0.18, 0.18, 0.98
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        ScrollView:
+            size_hint_y: 1
+            bar_width: dp(8)
+            do_scroll_x: False
+            Label:
+                text: root.full_text
+                font_size: dp(15)
+                color: (0.9, 0.9, 0.9, 1)
+                text_size: self.width - dp(10), None
+                size_hint_y: None
+                height: self.texture_size[1] + dp(10)
+                halign: 'left'
+                valign: 'top'
+                markup: True
+        Button:
+            text: 'Kapat'
+            size_hint_y: None
+            height: dp(45)
+            on_press: root.dismiss()
+
+<SelectableLabel>:
+    canvas.before:
+        Color:
+            rgba: (0.2, 0.6, 0.8, 0.3) if self.selected else (0, 0, 0, 0)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    font_size: dp(15)
+    halign: 'left'
+    valign: 'middle'
+    text_size: self.width - dp(20), None
+    padding: [dp(10), dp(5)]
+    max_lines: 2
+    shorten: True
+    shorten_from: 'right'
+    ellipsis_options: {'color':(0.7,0.7,0.7,1)}
+
+<MainScreen>:
+    id: main_screen_id
+    sorgu_input: sorgu_giris_id
+    result_label: result_label_id
+    arabic_label: arabic_label_id
+    transliteration_label: transliteration_label_id
+    mealler_layout: mealler_layout_id
+    hoca_search_input_main: hoca_search_input_main_id
+    favorite_ayet_button: main_favorite_toggle_button
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(8)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(45)
+            spacing: dp(5)
+            TextInput:
+                id: sorgu_giris_id
+                hint_text: "Sure Ayet (Örn: Bakara 5)"
+                multiline: False
+                font_size: dp(15)
+                on_text_validate: root.get_ayet_button_pressed()
+            Button:
+                text: 'Getir'
+                size_hint_x: None
+                width: dp(80)
+                font_size: dp(15)
+                on_press: root.get_ayet_button_pressed()
+            Button:
+                text: 'Rastgele'
+                size_hint_x: None
+                width: dp(100)
+                font_size: dp(15)
+                on_press: root.get_random_ayet_button_pressed()
+            Button:
+                text: "⚙️" # Ayarlar ikonu için emoji veya kısa metin
+                font_size: dp(20) # İkon gibi görünmesi için fontu büyütebiliriz
+                size_hint_x: None
+                width: self.height # Kare bir buton için genişliği yüksekliğe eşitle
+                on_press:
+                    app.root.current = 'settings'
+                    app.root.transition = FadeTransition(duration=0.2)
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            Button:
+                text: "Kaldığım Yerden Devam Et"
+                font_size: dp(16)
+                on_press: root.go_to_bookmark()
+                background_color: (0.2, 0.6, 0.8, 1)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: result_label_id.texture_size[1] + dp(8) if result_label_id.texture_size[1] > dp(18) else dp(38)
+            Label:
+                id: result_label_id
+                text: 'Lütfen sure ve ayet girin.'
+                size_hint_x: 0.85
+                font_size: dp(16)
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width, None
+            ToggleButton:
+                id: main_favorite_toggle_button # Bu ID, Python'daki ObjectProperty ile eşleşmeli
+                background_normal: app.HEART_EMPTY_IMG
+                background_down: app.HEART_FILLED_IMG
+                border: (0,0,0,0)
+                size_hint: None, None
+                size: dp(35), dp(35) # Uygun bir boyut verin
+                on_press: root.toggle_current_ayet_favorite()
+
+        ScrollView:
+            id: main_screen_scroll_view
+            size_hint_y: 1
+            bar_width: dp(8)
+            GridLayout:
+                id: main_scroll_content_layout
+                cols: 1
+                spacing: dp(8)
+                padding: dp(8)
+                size_hint_y: None
+                height: self.minimum_height
+                Label:
+                    text: "Arapça Metin:"
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(2)
+                    font_size: dp(14)
+                    bold: True
+                    text_size: self.width, None
+                    halign: 'left'
+                Label:
+                    id: arabic_label_id
+                    text: ''
+                    font_size: dp(13)
+                    color: (0.8, 0.8, 0.8, 1)
+                    line_height: 1.2
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(10) if self.texture_size[1] > 0 else 0
+                    text_size: self.width, None
+                    halign: 'center'
+                    valign: 'middle'
+                Button:
+                    text: "Arapçayı Kopyala (Tam Metin)"
+                    size_hint_y: None
+                    height: dp(36)
+                    font_size: dp(13)
+                    on_press: root.copy_arabic_text()
+                Label:
+                    id: transliteration_label_id
+                    text: ""
+                    font_size: dp(16)
+                    italic: True
+                    line_height: 1.3
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(5) if self.text else 0
+                    text_size: self.width, None
+                    halign: 'left'
+                    padding: [0, dp(5), 0, dp(5)]
+                Label:
+                    text: "Mealler:"
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(4)
+                    font_size: dp(15)
+                    bold: True
+                    text_size: self.width, None
+                    halign: 'left'
+                BoxLayout:
+                    id: hoca_search_input_wrapper
+                    size_hint_y: None
+                    height: dp(38)
+                    padding: [0, dp(2), 0, dp(5)]
+                    TextInput:
+                        id: hoca_search_input_main_id
+                        hint_text: "Hoca/meal çevirmeni içinde ara..."
+                        font_size: dp(14)
+                        multiline: False
+                        on_text: root._filter_displayed_mealler(self.text)
+                GridLayout:
+                    id: mealler_layout_id
+                    cols: 1
+                    spacing: dp(10)
+                    size_hint_y: None
+                    height: self.minimum_height
+
+        BoxLayout: # En alttaki navigasyon butonları
+            size_hint_y: None
+            height: dp(45)
+            spacing: dp(4)
+            Button:
+                text: "Okuma Modu"
+                font_size: dp(13)
+                on_press: root.open_read_mode_popup()
+            Button:
+                text: "Sure Konuları"
+                font_size: dp(13)
+                on_press: root.go_to_subject_selection()
+            Button:
+                text: "Geçmiş"
+                font_size: dp(13)
+                on_press:
+                    app.root.current = 'history'
+                    app.root.transition = FadeTransition(duration=0.2)
+            Button:
+                text: "Favorilerim"
+                font_size: dp(13)
+                on_press:
+                    app.root.current = 'favorite_ayets'
+                    app.root.transition = FadeTransition(duration=0.2)
+            Button:
+                text: "AI'a Sor" # <-- DEĞİŞTİ
+                font_size: dp(13)
+                on_press: root.go_to_ai_screen_with_context()
+
+<ReadModeStartPopup>: # Değişiklik yok
+    BoxLayout:
+        orientation: 'vertical'
+        padding: metrics.dp(10)
+        spacing: metrics.dp(10)
+        Label:
+            text: "Okuma Modu Nasıl Başlasın?"
+            font_size: metrics.dp(18)
+            size_hint_y: None
+            height: self.texture_size[1] + metrics.dp(10)
+        Button:
+            text: "Fatiha Suresi 1. Ayetten Başla"
+            size_hint_y: None
+            height: metrics.dp(45)
+            on_press: root.start_from_fatiha()
+        Button:
+            id: option2_button 
+            text: "Mevcut Ayetten Başla" 
+            size_hint_y: None
+            height: metrics.dp(45)
+            on_press: root.start_from_current()
+        BoxLayout:
+            size_hint_y: None
+            height: metrics.dp(45)
+            spacing: metrics.dp(5)
+            TextInput:
+                id: custom_sorgu_input 
+                hint_text: "Veya buradan girin (Örn: Bakara 5)"
+                multiline: False
+                font_size: metrics.dp(15)
+            Button:
+                text: "Başla"
+                size_hint_x: 0.3
+                font_size: metrics.dp(15)
+                on_press: root.start_from_custom()
+        Button:
+            text: "İptal"
+            size_hint_y: None
+            height: metrics.dp(45)
+            font_size: metrics.dp(15)
+            on_press: root.dismiss()
+
+<ReadModeNavPopup>:
+    title: "Diğer Seçenekler"
+    size_hint: (0.9, 0.6)
+    auto_dismiss: True
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(8)
+
+        # DÜZELTİLMİŞ YAPI: Butonlara sabit yükseklik verildi
+        GridLayout:
+            cols: 1
+            spacing: dp(8)
+            size_hint_y: None
+            height: self.minimum_height
+
+            Button:
+                text: "<< Önceki Sure"
+                font_size: dp(14)
+                size_hint_y: None  # Eklendi
+                height: dp(45)     # Eklendi
+                on_press: root.call_read_mode_method('navigate_surah', -1)
+            Button:
+                text: "Sonraki Sure >>"
+                font_size: dp(14)
+                size_hint_y: None  # Eklendi
+                height: dp(45)     # Eklendi
+                on_press: root.call_read_mode_method('navigate_surah', 1)
+            Button:
+                text: "Sure Başı"
+                font_size: dp(14)
+                size_hint_y: None  # Eklendi
+                height: dp(45)     # Eklendi
+                on_press: root.call_read_mode_method('go_to_surah_start')
+            Button:
+                text: "Sure Sonu"
+                font_size: dp(14)
+                size_hint_y: None  # Eklendi
+                height: dp(45)     # Eklendi
+                on_press: root.call_read_mode_method('go_to_surah_end')
+
+        Widget:
+            size_hint_y: 1
+
+        Button:
+            text: "Kapat"
+            size_hint_y: None
+            height: dp(45)
+            on_press: root.dismiss()
+
+<ReadModeScreen>:
+    header_label: header_label_id
+    arabic_read_label: arabic_read_label_id
+    transliteration_read_label: transliteration_read_label_id
+    mealler_read_layout: mealler_read_layout_id
+    read_mode_jump_input: read_mode_jump_input_id
+    favorite_ayet_button_read: favorite_ayet_button_read_id
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(8)
+        spacing: dp(3)
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: header_label_id.texture_size[1] + dp(8) if header_label_id.texture_size else dp(35)
+            Label:
+                id: header_label_id
+                text: "Okuma Modu"
+                font_size: dp(18)
+                bold: True
+                size_hint_x: 0.70
+                text_size: self.width, None
+                halign: 'center'
+                valign: 'middle'
+            Button:
+                text: "İşaretle" # Veya bir ikon kullanabilirsiniz
+                font_size: dp(13)
+                size_hint_x: None # Eklendi
+                width: dp(90)
+                on_press: root.set_bookmark()
+            ToggleButton:
+                id: favorite_ayet_button_read_id
+                background_normal: app.HEART_EMPTY_IMG
+                background_down: app.HEART_FILLED_IMG
+                size_hint_x: None
+                width: dp(50)
+                height: self.width
+                disabled: True
+                on_press: root.toggle_current_ayet_favorite_read_mode()
+                border: (0,0,0,0)
+
+        ScrollView:
+            size_hint: (1, 1)
+            bar_width: dp(8)
+            GridLayout:
+                cols: 1
+                spacing: dp(12)
+                padding: (dp(8), dp(10))
+                size_hint_y: None
+                height: self.minimum_height
+
+                Label:
+                    text: "Arapça Metin:"
+                    font_size: dp(15)
+                    bold: True
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(4)
+                    text_size: self.width, None
+                    halign: 'left'
+                Label:
+                    id: arabic_read_label_id
+                    text: "Şu an için ayetin arapça metnini görüntüleyemiyoruz. Ana menüdeki 'Arapçayı Kopyala' butonunu kullanabilirsiniz."
+                    font_size: dp(16)
+                    color: (0.8, 0.8, 0.8, 1)
+                    line_height: 1.2
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(12) if self.texture_size[1] > 0 else 0
+                    text_size: self.width, None
+                    halign: 'center'
+                    valign: 'middle'
+
+                Label:
+                    id: transliteration_read_label_id
+                    text: ""
+                    font_size: dp(15)
+                    italic: True
+                    line_height: 1.3
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(10) if self.text else 0
+                    text_size: self.width, None
+                    halign: 'left'
+                    padding: [0, dp(5), 0, dp(12)]
+                Label:
+                    text: "Mealler:"
+                    font_size: dp(15)
+                    bold: True
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(4)
+                    text_size: self.width, None
+                    halign: 'left'
+                GridLayout:
+                    id: mealler_read_layout_id
+                    cols: 1
+                    spacing: dp(8)
+                    size_hint_y: None
+                    height: self.minimum_height
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(45)
+            spacing: dp(5)
+            padding: [dp(2), dp(2), dp(2), dp(2)]
+
+            TextInput:
+                id: read_mode_jump_input_id
+                hint_text: "Git (Örn: Yasin 12)"
+                multiline: False
+                font_size: dp(14)
+                on_text_validate: root.jump_to_ayet_button_pressed()
+            Button:
+                text: "Git"
+                size_hint_x: 0.25
+                font_size: dp(14)
+                on_press: root.jump_to_ayet_button_pressed()
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(60)
+            spacing: dp(5)
+            padding: [dp(2), dp(5), dp(2), dp(5)]
+
+            Button:
+                text: "< Önceki Ayet"
+                font_size: dp(15)
+                on_press: root.navigate_ayet(-1)
+                disabled: root.is_loading
+            Button:
+                text: "Sonraki Ayet >"
+                font_size: dp(15)
+                on_press: root.navigate_ayet(1)
+                disabled: root.is_loading
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(50)
+            spacing: dp(5)
+            padding: [dp(2), 0, dp(2), dp(5)]
+
+            Button:
+                id: show_sure_subjects_button_id
+                text: f"[{root.current_sure_name_for_display}] Konuları" if root.current_sure_no != 0 else "Konular"
+                font_size: dp(14)
+                on_press: root.show_current_sure_subjects_popup()
+                disabled: root.current_sure_no == 0 or root.is_loading
+                size_hint_x: 0.45
+                text_size: self.width - dp(10), None
+                halign: 'center'
+                valign: 'middle'
+
+            Button:
+                text: "Diğer Butonlar..."
+                font_size: dp(14)
+                size_hint_x: 0.20
+                on_press: root.open_nav_popup()
+                disabled: root.is_loading
+
+            Button:
+                text: "Ana Menü"
+                font_size: dp(14)
+                size_hint_x: 0.35
+                on_press: root.go_to_main_menu()
+
+<HistoryScreen>:
+    history_layout: history_layout_id
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+        Label:
+            text: "Sorgu Geçmişi"
+            font_size: dp(24)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+        ScrollView:
+            GridLayout:
+                id: history_layout_id
+                cols: 1
+                spacing: dp(5)
+                size_hint_y: None
+                height: self.minimum_height
+        Button:
+            text: "Ana Menüye Dön"
+            size_hint_y: None
+            height: dp(50)
+            font_size: dp(15)
+            on_press: app.root.current = 'main'
+
+<AIScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(15)
+        spacing: dp(10)
+
+        Label:
+            text: "Yapay Zeka Destekli Alim"
+            font_size: dp(24)
+            size_hint_y: None
+            height: self.texture_size[1]
+            bold: True
+
+        Label:
+            text: "İslami konulardaki sorularınızı veya merak ettiklerinizi buraya yazarak yapay zekaya sorabilirsiniz."
+            font_size: dp(14)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+            text_size: self.width, None
+            halign: 'center'
+            color: (0.8, 0.8, 0.8, 1)
+
+        Label:
+            id: context_info_label
+            text: "Bağlam bilgisi yükleniyor..."
+            font_size: dp(13)
+            italic: True
+            color: (0.6, 1, 0.6, 1)
+            size_hint_y: None
+            height: self.texture_size[1]
+            opacity: 0
+
+        Button:
+            id: remove_context_button
+            text: "Bağlamı Kaldır"
+            size_hint_y: None
+            height: dp(35)
+            font_size: dp(13)
+            opacity: 0
+            disabled: True
+            on_press: root.clear_context()
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
+            spacing: dp(5)
+            padding: [0, dp(10), 0, 0] # Üstten biraz boşluk
+
+            Label:
+                text: "Örnek Sorular:"
+                font_size: dp(12)
+                color: (0.7, 0.7, 0.7, 1)
+                size_hint_y: None
+                height: self.texture_size[1]
+                halign: 'left'
+                text_size: self.width, None
+
+            Button:
+                text: "Kader ve irade arasındaki denge nedir?"
+                font_size: dp(13)
+                size_hint_y: None
+                height: dp(35)
+                background_color: (0.2, 0.2, 0.2, 1)
+                on_press: ai_text_input.text = self.text
+
+            Button:
+                text: "Hayatın amacı ve imtihanların hikmeti nedir?"
+                font_size: dp(13)
+                size_hint_y: None
+                height: dp(35)
+                background_color: (0.2, 0.2, 0.2, 1)
+                on_press: ai_text_input.text = self.text
+
+            Button:
+                text: "Kur'an ve bilim ilişkisi hakkında bilgi verir misin?"
+                font_size: dp(13)
+                size_hint_y: None
+                height: dp(35)
+                background_color: (0.2, 0.2, 0.2, 1)
+                on_press: ai_text_input.text = self.text
+
+        TextInput:
+            id: ai_text_input
+            hint_text: "Sorunuzu buraya yazın..."
+            size_hint_y: 0.5 # Alanı biraz küçülttük
+            background_color: (0.95, 0.95, 0.95, 1)
+            foreground_color: (0,0,0,1)
+            font_size: dp(15)
+            padding: dp(8)
+
+        Label:
+            id: ai_status_label
+            text: ""
+            size_hint_y: None
+            height: self.texture_size[1]
+            font_size: dp(13)
+            color: (1, 1, 0, 1)
+
+        Button:
+            text: "Yapay Zekaya Gönder"
+            font_size: dp(16)
+            size_hint_y: None
+            height: dp(50)
+            on_press: root.send_to_ai()
+            background_color: (0.2, 0.6, 0.8, 1)
+
+        Button:
+            text: "Ana Menüye Dön"
+            font_size: dp(15)
+            size_hint_y: None
+            height: dp(45)
+            on_press: app.root.current = 'main'
+
+<FavoriteAyetsScreen>:
+    favorite_ayets_layout: favorite_ayets_layout_id
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+        Label:
+            text: "Favori Ayetlerim"
+            font_size: dp(24)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+            bold: True
+        ScrollView:
+            size_hint: (1, 1)
+            bar_width: dp(10)
+            GridLayout:
+                id: favorite_ayets_layout_id
+                cols: 1
+                spacing: dp(8)
+                padding: (dp(5), dp(5))
+                size_hint_y: None
+                height: self.minimum_height
+        Button:
+            text: "Ana Menüye Dön"
+            font_size: dp(16)
+            size_hint_y: None
+            height: dp(50)
+            on_press: root.go_to_main_menu()
+
+<SettingsScreen>:
+    favorite_hocas_layout: favorite_hocas_layout_id
+    status_message_settings: status_message_settings_id
+    max_favorites_slider: max_fav_slider_id
+    max_favorites_value_label: max_fav_value_label_id
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+        Label:
+            text: "Ayarlar"
+            font_size: dp(24)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(40)
+            spacing: dp(10)
+            Label:
+                text: "Okuma Modu Max Favori Sayısı:"
+                size_hint_x: 0.6
+                font_size: dp(15)
+                halign: 'left'
+                valign: 'middle'
+                text_size: self.width, None
+            Slider:
+                id: max_fav_slider_id
+                min: 3
+                max: 7
+                step: 1
+                value: 3
+                size_hint_x: 0.3
+                on_value: root.update_max_favorites_label(self.value)
+                on_touch_up: root.save_slider_setting(self)
+            Label:
+                id: max_fav_value_label_id
+                text: "3"
+                size_hint_x: 0.1
+                font_size: dp(15)
+                halign: 'center'
+                valign: 'middle'
+        Label:
+            text: "Okuma Modu İçin Favori Meal Yazarları (En Fazla Seçili Sayıda):"
+            font_size: dp(16)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(5)
+            text_size: self.width, None
+            halign: 'left'
+        ScrollView:
+            size_hint_y: 0.5
+            GridLayout:
+                id: favorite_hocas_layout_id
+                cols: 1
+                spacing: dp(5)
+                size_hint_y: None
+                height: self.minimum_height
+        Label:
+            id: status_message_settings_id
+            text: ""
+            font_size: dp(14)
+            size_hint_y: None
+            height: self.texture_size[1] if self.text else 0
+            color: (0.1, 0.1, 0.1, 1)
+        Button:
+            text: "Ayet Önbelleğini Temizle"
+            font_size: dp(15)
+            size_hint_y: None
+            height: dp(45)
+            on_press: root.clear_cache_button_pressed()
+        Button:
+            text: "Ana Menüye Dön"
+            font_size: dp(15)
+            size_hint_y: None
+            height: dp(45)
+            on_press: app.root.current = 'main'
+
+<SubjectSelectionScreen>:
+    status_label_subjects: status_label_subjects_id
+    search_input_subjects: search_input_subjects_id
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, 1
+        padding: dp(8)
+        spacing: dp(5)
+        Label:
+            id: subjects_header_label
+            text: "Sureler"
+            font_size: dp(20)
+            bold: True
+            size_hint_y: None
+            height: self.texture_size[1] + dp(6)
+        Label:
+            id: status_label_subjects_id
+            text: "Yükleniyor..."
+            font_size: dp(14)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(6) if self.text else 0
+            text_size: self.width, None
+            halign: 'center'
+            valign: 'middle'
+            color: (0.5, 0.5, 0.5, 1)
+        Label:
+            text: "İpucu: Konuların tam metni için satıra uzun basabilirsiniz."
+            font_size: dp(12)
+            color: (0.6, 0.6, 0.6, 1)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(4) if self.text else 0
+            text_size: self.width, None
+            halign: 'center'
+            padding: [0, dp(5)]
+        BoxLayout:
+            size_hint_y: None
+            height: dp(38)
+            TextInput:
+                id: search_input_subjects_id
+                hint_text: "Sure adı veya genel konu ara..."
+                font_size: dp(14)
+                size_hint_x: 1
+                multiline: False
+                on_text: root.filter_displayed_subjects(self.text)
+        RecycleView:
+            id: subject_recycle_view
+            viewclass: 'SelectableLabel'
+            data: root.subject_rv_data
+            scroll_type: ['bars', 'content']
+            bar_width: dp(8)
+            size_hint_y: 1
+            CustomRecycleBoxLayout:
+                default_size: None, dp(46)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+                spacing: dp(2)
+        BoxLayout:
+            size_hint_y: None
+            height: dp(42)
+            spacing: dp(8)
+            Button:
+                id: subjects_back_button
+                text: "Sure Listesine Dön"
+                font_size: dp(15)
+                disabled: True
+                on_press: root.go_back_to_surah_list()
+            Button:
+                text: "Ana Menüye Dön"
+                font_size: dp(15)
+=======
+#:import metrics kivy.metrics
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+
+<SureSubjectsPopup>:
+    title: root.popup_title
+    size_hint: (0.9, 0.85)
+    auto_dismiss: True
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(8)
+        canvas.before:
+            Color:
+                rgba: 0.12, 0.12, 0.12, 0.99
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        RecycleView:
+            id: popup_subjects_rv
+            viewclass: 'SelectableLabel'
+            data: root.subjects_list_data
+            scroll_type: ['bars', 'content']
+            bar_width: dp(8)
+            CustomRecycleBoxLayout:
+                default_size: None, dp(48)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+                spacing: dp(3)
+        Button:
+            text: "Kapat"
+            font_size: dp(15)
+            size_hint_y: None
+            height: dp(45)
+            on_press: root.dismiss()
+
+<ManageFavoritesPopup>:
+    title: "Favori Yönetimi" 
+    size_hint: 0.9, 0.8
+    auto_dismiss: True
+    favorite_management_layout: fav_management_layout_in_kv 
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+
+        Label:
+            id: info_label_for_popup 
+            text: root.info_text_for_label # Python'daki property'den metni al
+            size_hint_y: None
+            height: self.texture_size[1] + dp(20)
+            halign: 'center'
+            text_size: self.width - dp(20), None
+
+        ScrollView:
+            size_hint_y: 1
+            GridLayout:
+                id: fav_management_layout_in_kv 
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: dp(5)
+        
+        Button:
+            text: "Kapat"
+            size_hint_y: None
+            height: dp(44)
+            on_press: root.dismiss()
+
+<FullTextPopup>:
+    title: root.popup_title
+    size_hint: (0.9, 0.7)
+    auto_dismiss: True
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+        canvas.before:
+            Color:
+                rgba: 0.18, 0.18, 0.18, 0.98
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        ScrollView:
+            size_hint_y: 1
+            bar_width: dp(8)
+            do_scroll_x: False
+            Label:
+                text: root.full_text
+                font_size: dp(15)
+                color: (0.9, 0.9, 0.9, 1)
+                text_size: self.width - dp(10), None
+                size_hint_y: None
+                height: self.texture_size[1] + dp(10)
+                halign: 'left'
+                valign: 'top'
+                markup: True
+        Button:
+            text: 'Kapat'
+            size_hint_y: None
+            height: dp(45)
+            on_press: root.dismiss()
+
+<SelectableLabel>:
+    canvas.before:
+        Color:
+            rgba: (0.2, 0.6, 0.8, 0.3) if self.selected else (0, 0, 0, 0)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    font_size: dp(15)
+    halign: 'left'
+    valign: 'middle'
+    text_size: self.width - dp(20), None
+    padding: [dp(10), dp(5)]
+    max_lines: 2
+    shorten: True
+    shorten_from: 'right'
+    ellipsis_options: {'color':(0.7,0.7,0.7,1)}
+
+<MainScreen>:
+    id: main_screen_id
+    sorgu_input: sorgu_giris_id
+    result_label: result_label_id
+    arabic_label: arabic_label_id
+    transliteration_label: transliteration_label_id
+    mealler_layout: mealler_layout_id
+    hoca_search_input_main: hoca_search_input_main_id
+    favorite_ayet_button: main_favorite_toggle_button
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(8)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(45)
+            spacing: dp(5)
+            TextInput:
+                id: sorgu_giris_id
+                hint_text: "Sure Ayet (Örn: Bakara 5)"
+                multiline: False
+                font_size: dp(15)
+                on_text_validate: root.get_ayet_button_pressed()
+            Button:
+                text: 'Getir'
+                size_hint_x: None
+                width: dp(80)
+                font_size: dp(15)
+                on_press: root.get_ayet_button_pressed()
+            Button:
+                text: 'Rastgele'
+                size_hint_x: None
+                width: dp(100)
+                font_size: dp(15)
+                on_press: root.get_random_ayet_button_pressed()
+            Button:
+                text: "⚙️" # Ayarlar ikonu için emoji veya kısa metin
+                font_size: dp(20) # İkon gibi görünmesi için fontu büyütebiliriz
+                size_hint_x: None
+                width: self.height # Kare bir buton için genişliği yüksekliğe eşitle
+                on_press:
+                    app.root.current = 'settings'
+                    app.root.transition = FadeTransition(duration=0.2)
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            Button:
+                text: "Kaldığım Yerden Devam Et"
+                font_size: dp(16)
+                on_press: root.go_to_bookmark()
+                background_color: (0.2, 0.6, 0.8, 1)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: result_label_id.texture_size[1] + dp(8) if result_label_id.texture_size[1] > dp(18) else dp(38)
+            Label:
+                id: result_label_id
+                text: 'Lütfen sure ve ayet girin.'
+                size_hint_x: 0.85
+                font_size: dp(16)
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width, None
+            ToggleButton:
+                id: main_favorite_toggle_button # Bu ID, Python'daki ObjectProperty ile eşleşmeli
+                background_normal: app.HEART_EMPTY_IMG
+                background_down: app.HEART_FILLED_IMG
+                border: (0,0,0,0)
+                size_hint: None, None
+                size: dp(35), dp(35) # Uygun bir boyut verin
+                on_press: root.toggle_current_ayet_favorite()
+
+        ScrollView:
+            id: main_screen_scroll_view
+            size_hint_y: 1
+            bar_width: dp(8)
+            GridLayout:
+                id: main_scroll_content_layout
+                cols: 1
+                spacing: dp(8)
+                padding: dp(8)
+                size_hint_y: None
+                height: self.minimum_height
+                Label:
+                    text: "Arapça Metin:"
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(2)
+                    font_size: dp(14)
+                    bold: True
+                    text_size: self.width, None
+                    halign: 'left'
+                Label:
+                    id: arabic_label_id
+                    text: ''
+                    font_size: dp(13)
+                    color: (0.8, 0.8, 0.8, 1)
+                    line_height: 1.2
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(10) if self.texture_size[1] > 0 else 0
+                    text_size: self.width, None
+                    halign: 'center'
+                    valign: 'middle'
+                Button:
+                    text: "Arapçayı Kopyala (Tam Metin)"
+                    size_hint_y: None
+                    height: dp(36)
+                    font_size: dp(13)
+                    on_press: root.copy_arabic_text()
+                Label:
+                    id: transliteration_label_id
+                    text: ""
+                    font_size: dp(16)
+                    italic: True
+                    line_height: 1.3
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(5) if self.text else 0
+                    text_size: self.width, None
+                    halign: 'left'
+                    padding: [0, dp(5), 0, dp(5)]
+                Label:
+                    text: "Mealler:"
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(4)
+                    font_size: dp(15)
+                    bold: True
+                    text_size: self.width, None
+                    halign: 'left'
+                BoxLayout:
+                    id: hoca_search_input_wrapper
+                    size_hint_y: None
+                    height: dp(38)
+                    padding: [0, dp(2), 0, dp(5)]
+                    TextInput:
+                        id: hoca_search_input_main_id
+                        hint_text: "Hoca/meal çevirmeni içinde ara..."
+                        font_size: dp(14)
+                        multiline: False
+                        on_text: root._filter_displayed_mealler(self.text)
+                GridLayout:
+                    id: mealler_layout_id
+                    cols: 1
+                    spacing: dp(10)
+                    size_hint_y: None
+                    height: self.minimum_height
+
+        BoxLayout: # En alttaki navigasyon butonları
+            size_hint_y: None
+            height: dp(45)
+            spacing: dp(4)
+            Button:
+                text: "Okuma Modu"
+                font_size: dp(13)
+                on_press: root.open_read_mode_popup()
+            Button:
+                text: "Sure Konuları"
+                font_size: dp(13)
+                on_press: root.go_to_subject_selection()
+            Button:
+                text: "Geçmiş"
+                font_size: dp(13)
+                on_press:
+                    app.root.current = 'history'
+                    app.root.transition = FadeTransition(duration=0.2)
+            Button:
+                text: "Favorilerim"
+                font_size: dp(13)
+                on_press:
+                    app.root.current = 'favorite_ayets'
+                    app.root.transition = FadeTransition(duration=0.2)
+            Button:
+                text: "AI'a Sor" # <-- DEĞİŞTİ
+                font_size: dp(13)
+                on_press: root.go_to_ai_screen_with_context()
+
+<ReadModeStartPopup>: # Değişiklik yok
+    BoxLayout:
+        orientation: 'vertical'
+        padding: metrics.dp(10)
+        spacing: metrics.dp(10)
+        Label:
+            text: "Okuma Modu Nasıl Başlasın?"
+            font_size: metrics.dp(18)
+            size_hint_y: None
+            height: self.texture_size[1] + metrics.dp(10)
+        Button:
+            text: "Fatiha Suresi 1. Ayetten Başla"
+            size_hint_y: None
+            height: metrics.dp(45)
+            on_press: root.start_from_fatiha()
+        Button:
+            id: option2_button 
+            text: "Mevcut Ayetten Başla" 
+            size_hint_y: None
+            height: metrics.dp(45)
+            on_press: root.start_from_current()
+        BoxLayout:
+            size_hint_y: None
+            height: metrics.dp(45)
+            spacing: metrics.dp(5)
+            TextInput:
+                id: custom_sorgu_input 
+                hint_text: "Veya buradan girin (Örn: Bakara 5)"
+                multiline: False
+                font_size: metrics.dp(15)
+            Button:
+                text: "Başla"
+                size_hint_x: 0.3
+                font_size: metrics.dp(15)
+                on_press: root.start_from_custom()
+        Button:
+            text: "İptal"
+            size_hint_y: None
+            height: metrics.dp(45)
+            font_size: metrics.dp(15)
+            on_press: root.dismiss()
+
+<ReadModeNavPopup>:
+    title: "Diğer Seçenekler"
+    size_hint: (0.9, 0.6)
+    auto_dismiss: True
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(8)
+
+        # DÜZELTİLMİŞ YAPI: Butonlara sabit yükseklik verildi
+        GridLayout:
+            cols: 1
+            spacing: dp(8)
+            size_hint_y: None
+            height: self.minimum_height
+
+            Button:
+                text: "<< Önceki Sure"
+                font_size: dp(14)
+                size_hint_y: None  # Eklendi
+                height: dp(45)     # Eklendi
+                on_press: root.call_read_mode_method('navigate_surah', -1)
+            Button:
+                text: "Sonraki Sure >>"
+                font_size: dp(14)
+                size_hint_y: None  # Eklendi
+                height: dp(45)     # Eklendi
+                on_press: root.call_read_mode_method('navigate_surah', 1)
+            Button:
+                text: "Sure Başı"
+                font_size: dp(14)
+                size_hint_y: None  # Eklendi
+                height: dp(45)     # Eklendi
+                on_press: root.call_read_mode_method('go_to_surah_start')
+            Button:
+                text: "Sure Sonu"
+                font_size: dp(14)
+                size_hint_y: None  # Eklendi
+                height: dp(45)     # Eklendi
+                on_press: root.call_read_mode_method('go_to_surah_end')
+
+        Widget:
+            size_hint_y: 1
+
+        Button:
+            text: "Kapat"
+            size_hint_y: None
+            height: dp(45)
+            on_press: root.dismiss()
+
+<ReadModeScreen>:
+    header_label: header_label_id
+    arabic_read_label: arabic_read_label_id
+    transliteration_read_label: transliteration_read_label_id
+    mealler_read_layout: mealler_read_layout_id
+    read_mode_jump_input: read_mode_jump_input_id
+    favorite_ayet_button_read: favorite_ayet_button_read_id
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(8)
+        spacing: dp(3)
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: header_label_id.texture_size[1] + dp(8) if header_label_id.texture_size else dp(35)
+            Label:
+                id: header_label_id
+                text: "Okuma Modu"
+                font_size: dp(18)
+                bold: True
+                size_hint_x: 0.70
+                text_size: self.width, None
+                halign: 'center'
+                valign: 'middle'
+            Button:
+                text: "İşaretle" # Veya bir ikon kullanabilirsiniz
+                font_size: dp(13)
+                size_hint_x: None # Eklendi
+                width: dp(90)
+                on_press: root.set_bookmark()
+            ToggleButton:
+                id: favorite_ayet_button_read_id
+                background_normal: app.HEART_EMPTY_IMG
+                background_down: app.HEART_FILLED_IMG
+                size_hint_x: None
+                width: dp(50)
+                height: self.width
+                disabled: True
+                on_press: root.toggle_current_ayet_favorite_read_mode()
+                border: (0,0,0,0)
+
+        ScrollView:
+            size_hint: (1, 1)
+            bar_width: dp(8)
+            GridLayout:
+                cols: 1
+                spacing: dp(12)
+                padding: (dp(8), dp(10))
+                size_hint_y: None
+                height: self.minimum_height
+
+                Label:
+                    text: "Arapça Metin:"
+                    font_size: dp(15)
+                    bold: True
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(4)
+                    text_size: self.width, None
+                    halign: 'left'
+                Label:
+                    id: arabic_read_label_id
+                    text: "Şu an için ayetin arapça metnini görüntüleyemiyoruz. Ana menüdeki 'Arapçayı Kopyala' butonunu kullanabilirsiniz."
+                    font_size: dp(16)
+                    color: (0.8, 0.8, 0.8, 1)
+                    line_height: 1.2
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(12) if self.texture_size[1] > 0 else 0
+                    text_size: self.width, None
+                    halign: 'center'
+                    valign: 'middle'
+
+                Label:
+                    id: transliteration_read_label_id
+                    text: ""
+                    font_size: dp(15)
+                    italic: True
+                    line_height: 1.3
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(10) if self.text else 0
+                    text_size: self.width, None
+                    halign: 'left'
+                    padding: [0, dp(5), 0, dp(12)]
+                Label:
+                    text: "Mealler:"
+                    font_size: dp(15)
+                    bold: True
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(4)
+                    text_size: self.width, None
+                    halign: 'left'
+                GridLayout:
+                    id: mealler_read_layout_id
+                    cols: 1
+                    spacing: dp(8)
+                    size_hint_y: None
+                    height: self.minimum_height
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(45)
+            spacing: dp(5)
+            padding: [dp(2), dp(2), dp(2), dp(2)]
+
+            TextInput:
+                id: read_mode_jump_input_id
+                hint_text: "Git (Örn: Yasin 12)"
+                multiline: False
+                font_size: dp(14)
+                on_text_validate: root.jump_to_ayet_button_pressed()
+            Button:
+                text: "Git"
+                size_hint_x: 0.25
+                font_size: dp(14)
+                on_press: root.jump_to_ayet_button_pressed()
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(60)
+            spacing: dp(5)
+            padding: [dp(2), dp(5), dp(2), dp(5)]
+
+            Button:
+                text: "< Önceki Ayet"
+                font_size: dp(15)
+                on_press: root.navigate_ayet(-1)
+                disabled: root.is_loading
+            Button:
+                text: "Sonraki Ayet >"
+                font_size: dp(15)
+                on_press: root.navigate_ayet(1)
+                disabled: root.is_loading
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(50)
+            spacing: dp(5)
+            padding: [dp(2), 0, dp(2), dp(5)]
+
+            Button:
+                id: show_sure_subjects_button_id
+                text: f"[{root.current_sure_name_for_display}] Konuları" if root.current_sure_no != 0 else "Konular"
+                font_size: dp(14)
+                on_press: root.show_current_sure_subjects_popup()
+                disabled: root.current_sure_no == 0 or root.is_loading
+                size_hint_x: 0.45
+                text_size: self.width - dp(10), None
+                halign: 'center'
+                valign: 'middle'
+
+            Button:
+                text: "Diğer Butonlar..."
+                font_size: dp(14)
+                size_hint_x: 0.20
+                on_press: root.open_nav_popup()
+                disabled: root.is_loading
+
+            Button:
+                text: "Ana Menü"
+                font_size: dp(14)
+                size_hint_x: 0.35
+                on_press: root.go_to_main_menu()
+
+<HistoryScreen>:
+    history_layout: history_layout_id
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+        Label:
+            text: "Sorgu Geçmişi"
+            font_size: dp(24)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+        ScrollView:
+            GridLayout:
+                id: history_layout_id
+                cols: 1
+                spacing: dp(5)
+                size_hint_y: None
+                height: self.minimum_height
+        Button:
+            text: "Ana Menüye Dön"
+            size_hint_y: None
+            height: dp(50)
+            font_size: dp(15)
+            on_press: app.root.current = 'main'
+
+<AIScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(15)
+        spacing: dp(10)
+
+        Label:
+            text: "Yapay Zeka Destekli Alim"
+            font_size: dp(24)
+            size_hint_y: None
+            height: self.texture_size[1]
+            bold: True
+
+        Label:
+            text: "İslami konulardaki sorularınızı veya merak ettiklerinizi buraya yazarak yapay zekaya sorabilirsiniz."
+            font_size: dp(14)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+            text_size: self.width, None
+            halign: 'center'
+            color: (0.8, 0.8, 0.8, 1)
+
+        Label:
+            id: context_info_label
+            text: "Bağlam bilgisi yükleniyor..."
+            font_size: dp(13)
+            italic: True
+            color: (0.6, 1, 0.6, 1)
+            size_hint_y: None
+            height: self.texture_size[1]
+            opacity: 0
+
+        Button:
+            id: remove_context_button
+            text: "Bağlamı Kaldır"
+            size_hint_y: None
+            height: dp(35)
+            font_size: dp(13)
+            opacity: 0
+            disabled: True
+            on_press: root.clear_context()
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
+            spacing: dp(5)
+            padding: [0, dp(10), 0, 0] # Üstten biraz boşluk
+
+            Label:
+                text: "Örnek Sorular:"
+                font_size: dp(12)
+                color: (0.7, 0.7, 0.7, 1)
+                size_hint_y: None
+                height: self.texture_size[1]
+                halign: 'left'
+                text_size: self.width, None
+
+            Button:
+                text: "Kader ve irade arasındaki denge nedir?"
+                font_size: dp(13)
+                size_hint_y: None
+                height: dp(35)
+                background_color: (0.2, 0.2, 0.2, 1)
+                on_press: ai_text_input.text = self.text
+
+            Button:
+                text: "Hayatın amacı ve imtihanların hikmeti nedir?"
+                font_size: dp(13)
+                size_hint_y: None
+                height: dp(35)
+                background_color: (0.2, 0.2, 0.2, 1)
+                on_press: ai_text_input.text = self.text
+
+            Button:
+                text: "Kur'an ve bilim ilişkisi hakkında bilgi verir misin?"
+                font_size: dp(13)
+                size_hint_y: None
+                height: dp(35)
+                background_color: (0.2, 0.2, 0.2, 1)
+                on_press: ai_text_input.text = self.text
+
+        TextInput:
+            id: ai_text_input
+            hint_text: "Sorunuzu buraya yazın..."
+            size_hint_y: 0.5 # Alanı biraz küçülttük
+            background_color: (0.95, 0.95, 0.95, 1)
+            foreground_color: (0,0,0,1)
+            font_size: dp(15)
+            padding: dp(8)
+
+        Label:
+            id: ai_status_label
+            text: ""
+            size_hint_y: None
+            height: self.texture_size[1]
+            font_size: dp(13)
+            color: (1, 1, 0, 1)
+
+        Button:
+            text: "Yapay Zekaya Gönder"
+            font_size: dp(16)
+            size_hint_y: None
+            height: dp(50)
+            on_press: root.send_to_ai()
+            background_color: (0.2, 0.6, 0.8, 1)
+
+        Button:
+            text: "Ana Menüye Dön"
+            font_size: dp(15)
+            size_hint_y: None
+            height: dp(45)
+            on_press: app.root.current = 'main'
+
+<FavoriteAyetsScreen>:
+    favorite_ayets_layout: favorite_ayets_layout_id
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+        Label:
+            text: "Favori Ayetlerim"
+            font_size: dp(24)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+            bold: True
+        ScrollView:
+            size_hint: (1, 1)
+            bar_width: dp(10)
+            GridLayout:
+                id: favorite_ayets_layout_id
+                cols: 1
+                spacing: dp(8)
+                padding: (dp(5), dp(5))
+                size_hint_y: None
+                height: self.minimum_height
+        Button:
+            text: "Ana Menüye Dön"
+            font_size: dp(16)
+            size_hint_y: None
+            height: dp(50)
+            on_press: root.go_to_main_menu()
+
+<SettingsScreen>:
+    favorite_hocas_layout: favorite_hocas_layout_id
+    status_message_settings: status_message_settings_id
+    max_favorites_slider: max_fav_slider_id
+    max_favorites_value_label: max_fav_value_label_id
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+        Label:
+            text: "Ayarlar"
+            font_size: dp(24)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(40)
+            spacing: dp(10)
+            Label:
+                text: "Okuma Modu Max Favori Sayısı:"
+                size_hint_x: 0.6
+                font_size: dp(15)
+                halign: 'left'
+                valign: 'middle'
+                text_size: self.width, None
+            Slider:
+                id: max_fav_slider_id
+                min: 3
+                max: 7
+                step: 1
+                value: 3
+                size_hint_x: 0.3
+                on_value: root.update_max_favorites_label(self.value)
+                on_touch_up: root.save_slider_setting(self)
+            Label:
+                id: max_fav_value_label_id
+                text: "3"
+                size_hint_x: 0.1
+                font_size: dp(15)
+                halign: 'center'
+                valign: 'middle'
+        Label:
+            text: "Okuma Modu İçin Favori Meal Yazarları (En Fazla Seçili Sayıda):"
+            font_size: dp(16)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(5)
+            text_size: self.width, None
+            halign: 'left'
+        ScrollView:
+            size_hint_y: 0.5
+            GridLayout:
+                id: favorite_hocas_layout_id
+                cols: 1
+                spacing: dp(5)
+                size_hint_y: None
+                height: self.minimum_height
+        Label:
+            id: status_message_settings_id
+            text: ""
+            font_size: dp(14)
+            size_hint_y: None
+            height: self.texture_size[1] if self.text else 0
+            color: (0.1, 0.1, 0.1, 1)
+        Button:
+            text: "Ayet Önbelleğini Temizle"
+            font_size: dp(15)
+            size_hint_y: None
+            height: dp(45)
+            on_press: root.clear_cache_button_pressed()
+        Button:
+            text: "Ana Menüye Dön"
+            font_size: dp(15)
+            size_hint_y: None
+            height: dp(45)
+            on_press: app.root.current = 'main'
+
+<SubjectSelectionScreen>:
+    status_label_subjects: status_label_subjects_id
+    search_input_subjects: search_input_subjects_id
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, 1
+        padding: dp(8)
+        spacing: dp(5)
+        Label:
+            id: subjects_header_label
+            text: "Sureler"
+            font_size: dp(20)
+            bold: True
+            size_hint_y: None
+            height: self.texture_size[1] + dp(6)
+        Label:
+            id: status_label_subjects_id
+            text: "Yükleniyor..."
+            font_size: dp(14)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(6) if self.text else 0
+            text_size: self.width, None
+            halign: 'center'
+            valign: 'middle'
+            color: (0.5, 0.5, 0.5, 1)
+        Label:
+            text: "İpucu: Konuların tam metni için satıra uzun basabilirsiniz."
+            font_size: dp(12)
+            color: (0.6, 0.6, 0.6, 1)
+            size_hint_y: None
+            height: self.texture_size[1] + dp(4) if self.text else 0
+            text_size: self.width, None
+            halign: 'center'
+            padding: [0, dp(5)]
+        BoxLayout:
+            size_hint_y: None
+            height: dp(38)
+            TextInput:
+                id: search_input_subjects_id
+                hint_text: "Sure adı veya genel konu ara..."
+                font_size: dp(14)
+                size_hint_x: 1
+                multiline: False
+                on_text: root.filter_displayed_subjects(self.text)
+        RecycleView:
+            id: subject_recycle_view
+            viewclass: 'SelectableLabel'
+            data: root.subject_rv_data
+            scroll_type: ['bars', 'content']
+            bar_width: dp(8)
+            size_hint_y: 1
+            CustomRecycleBoxLayout:
+                default_size: None, dp(46)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+                spacing: dp(2)
+        BoxLayout:
+            size_hint_y: None
+            height: dp(42)
+            spacing: dp(8)
+            Button:
+                id: subjects_back_button
+                text: "Sure Listesine Dön"
+                font_size: dp(15)
+                disabled: True
+                on_press: root.go_back_to_surah_list()
+            Button:
+                text: "Ana Menüye Dön"
+                font_size: dp(15)
+>>>>>>> 740915bd44ab93452c59f880e4f442eec6a0d8fa
+                on_press: root.go_to_main_menu_from_subjects()
