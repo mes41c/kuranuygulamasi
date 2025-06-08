@@ -1975,6 +1975,7 @@ class KuranApp(MDApp, EventDispatcher):
         pass
 
     def build(self):
+        self.theme_cls.theme_style = "Dark"
         sm = ScreenManager(transition=FadeTransition(duration=0.2))
         sm.add_widget(MainScreen(name='main'))
         sm.add_widget(SettingsScreen(name='settings'))
