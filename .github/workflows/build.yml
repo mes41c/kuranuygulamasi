@@ -10,27 +10,45 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install OpenGL and other System Dependencies
-        # Bu adım, Kivy derlemesi için gereken eksik sistem kütüphanelerini kurar.
+      # Adım 1: Kivy'nin ihtiyaç duyduğu TÜM sistem kütüphanelerini kuruyoruz.
+      - name: Install All System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev
-      
+          sudo apt-get install -y \
+            git \
+            zip \
+            unzip \
+            build-essential \
+            pkg-config \
+            libgl-dev \
+            libgl1-mesa-dev \
+            libgles2-mesa-dev \
+            libegl1-mesa-dev \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libgstreamer1.0-dev \
+            gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-good \
+            libwayland-dev \
+            libx11-dev
+
+      # Adım 2: Veritabanını indiriyoruz.
       - name: Download Database from Releases
         run: |
           echo "Downloading database..."
           curl -sL -o kuran_uyg_genel_data.db "https://github.com/mes41c/kuranuygulamasi/releases/download/v1.0-db/kuran_uyg_genel_data.db"
           ls -lh kuran_uyg_genel_data.db
 
-      - name: Clean build cache
-        run: buildozer android clean
-      
+      # Adım 3: Buildozer ile derliyoruz.
       - name: Build with Buildozer
         uses: ArtemSBulgakov/buildozer-action@v1
         id: buildozer
         with:
           command: buildozer -v android debug
-          
+
+      # Adım 4: APK'yı yüklüyoruz.
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
