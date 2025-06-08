@@ -8,6 +8,8 @@ version = 0.1
 requirements = python3,kivy==2.3.1,kivymd==1.2.0,pillow,sqlite3,beautifulsoup4,requests,plyer,filetype
 orientation = portrait
 fullscreen = 0
+icon.filename = images/kuranappicon.png
+presplash.filename = images/mes.png
 
 [android]
 android.api = 34
