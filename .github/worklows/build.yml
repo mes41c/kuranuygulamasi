@@ -1,5 +1,9 @@
 name: Build Kivy Android App
-on: [push]
+on:
+  push:
+    branches:
+      - main  # Sadece main branch'e push yapıldığında çalışmasını sağlar
+  workflow_dispatch:
 jobs:
   build-android:
     runs-on: ubuntu-latest
