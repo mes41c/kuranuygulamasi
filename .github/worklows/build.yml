@@ -1,28 +1,42 @@
 name: Build Kivy Android App
+
 on:
+  # Bu satır, "main" branch'ine her kod gönderildiğinde derlemeyi otomatik başlatır.
   push:
     branches:
-      - main  # Sadece main branch'e push yapıldığında çalışmasını sağlar
+      - main
+  # Bu satır, GitHub Actions sekmesinden manuel derleme yapmanızı sağlayan butonu ekler.
   workflow_dispatch:
+
 jobs:
   build-android:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set up JDK 8 
+
+      - name: Set up JDK 8 for Android SDK
         uses: actions/setup-java@v4
         with:
+          # Android araçları için en kararlı ve uyumlu sürüm JDK 8'dir.
           java-version: '8'
           distribution: 'temurin'
+
       - name: Download Database from Releases
         run: |
           curl -sL -o kuran_uyg_genel_data.db "https://github.com/mes41c/kuranuygulamasi/releases/download/v1.0-db/kuran_uyg_genel_data.db"
+      
       - name: Build with Buildozer
         uses: ArtemSBulgakov/buildozer-action@v1
         id: buildozer
         with:
           command: buildozer -v android debug
+        env:
+          # Buildozer'a doğru Java ve Android SDK yollarını burada doğrudan belirtiyoruz.
+          # Bu, "JAVA_HOME is set to an invalid directory" hatasını çözecektir.
+          JAVA_HOME: ${{ env.JAVA_HOME }}
+          
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
